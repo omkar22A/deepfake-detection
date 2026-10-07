@@ -1,449 +1,417 @@
-# 🎭 AI Deepfake Video Detection
+# 🎭 Deepfake Video Detection
 
-An AI-powered deepfake video detection system that analyzes videos and predicts whether they are **REAL** or **FAKE** using deep learning.
+A deep learning–based web application for detecting whether a video is **REAL or FAKE** using a hybrid **MobileNetV2 + LSTM** architecture.
 
-The project combines **MobileNetV2** for visual feature extraction with **Bidirectional LSTM** and **Multi-Head Attention** for temporal analysis of video frames. A **Flask web application** provides an interactive interface for uploading videos and viewing prediction results.
+The project combines spatial feature extraction from video frames with temporal sequence modelling to analyze patterns across a video and produce a final deepfake prediction with confidence and probability scores.
 
 ---
 
 ## 🚀 Project Overview
 
-Deepfake technology can be used to manipulate faces and visual content in videos, making it increasingly difficult to distinguish authentic media from AI-generated or manipulated content.
+Deepfake technology can generate highly realistic manipulated videos, creating challenges for digital media verification and online safety.
 
-This project explores an end-to-end deep learning approach for deepfake video classification.
+This project aims to provide an accessible deepfake detection system where users can upload a video through a web interface and receive:
 
-The system:
-
-1. Accepts a video as input.
-2. Samples frames from the video.
-3. Detects and crops faces.
-4. Extracts visual features using MobileNetV2.
-5. Processes the sequence of frame features using Bidirectional LSTM layers.
-6. Uses Multi-Head Attention to learn important temporal patterns.
-7. Produces a REAL or FAKE prediction.
-8. Displays the prediction and confidence through a Flask web application.
+- **REAL / FAKE classification**
+- Prediction confidence
+- Fake probability
+- Real probability
+- Selected video-frame previews
+- Memory-efficient inference for systems with limited RAM
 
 ---
 
-## ✨ Features
+## 🧠 Model Architecture
 
-- 🎥 Video upload
-- 🖱️ Drag-and-drop video upload
-- 🤖 Deep learning based deepfake detection
-- 👤 Face detection and cropping
-- 🧠 MobileNetV2 feature extraction
-- 🔄 Bidirectional LSTM temporal modeling
-- 🎯 Multi-Head Attention
-- 📊 Fake probability
-- 📊 Real probability
-- 📈 Prediction confidence
-- 🖼️ Extracted frame visualization
-- 🌐 Flask web interface
-- 💻 Command-line prediction
-- 🧠 Memory-efficient inference
-- 📁 MP4, AVI, MOV, MKV and WEBM support
-
----
-
-# 🏗️ System Architecture
+The system uses a hybrid **CNN + LSTM** approach.
 
 ```text
-                    Input Video
-                         │
-                         ▼
-                Video Frame Sampling
-                         │
-                         ▼
-                   Face Detection
-                         │
-                         ▼
-                   Face Cropping
-                         │
-                         ▼
-                  Frame Resizing
-                    224 × 224
-                         │
-                         ▼
-                    MobileNetV2
-                 Feature Extraction
-                         │
-                         ▼
-              30 Frame Feature Sequence
-                         │
-                         ▼
-             Bidirectional LSTM
-                         │
-                         ▼
-             Bidirectional LSTM
-                         │
-                         ▼
-              Multi-Head Attention
-                         │
-                         ▼
-             Global Average Pooling
-                         │
-                         ▼
-                  Dense Layers
-                         │
-                         ▼
-                   Sigmoid Output
-                         │
-                         ▼
-                    REAL / FAKE
+                 Input Video
+                      │
+                      ▼
+              Frame Extraction
+                      │
+                      ▼
+                Video Frames
+                      │
+                      ▼
+               MobileNetV2
+            Spatial Feature Extraction
+                      │
+                      ▼
+             Sequential Features
+                      │
+                      ▼
+                    LSTM
+             Temporal Modelling
+                      │
+                      ▼
+              Binary Prediction
+                      │
+                      ▼
+          Threshold-based Decision
+             ┌────────┴────────┐
+             ▼                 ▼
+           REAL               FAKE
+```
 
-🧠 Model Architecture
-MobileNetV2
-MobileNetV2 is used as the visual feature extractor.
-Each processed video frame is resized to:
-224 × 224 × 3
+### MobileNetV2
 
-MobileNetV2 converts each frame into a:
-1280-dimensional feature vector
+MobileNetV2 is used as the convolutional feature extractor.
 
-The system processes a sequence of:
-30 frames
+It converts individual video frames into compact visual feature representations while keeping computational requirements relatively low.
 
-Therefore, each video is represented by:
-30 × 1280
+### LSTM
 
-features before temporal modeling.
-Bidirectional LSTM
-The extracted frame features are passed through Bidirectional LSTM layers.
-The Bidirectional LSTM processes temporal information in both forward and backward directions, allowing the model to learn relationships between frames throughout the video sequence.
-Multi-Head Attention
-A Multi-Head Attention layer is used after the recurrent layers.
-The attention mechanism helps the model focus on important temporal relationships within the sequence rather than treating every frame equally.
-Classification
-The temporal representation is processed using:
-Global Average Pooling
-        ↓
-Dense 256
-        ↓
-Dropout
-        ↓
-Dense 64
-        ↓
-Dropout
-        ↓
-Sigmoid
+The extracted frame features are treated as a temporal sequence and passed to an LSTM-based model.
 
-The final sigmoid output is used to determine the classification.
-📊 Dataset
-The processed dataset contains 3,999 video samples.
-Class	Samples
-Real	2,000
-Fake	1,999
-Total	3,999
+This allows the system to learn patterns that occur across multiple frames rather than relying on a single image.
 
+### Sequence Configuration
 
-Each video is converted into a sequence containing:
-- 30 frames
-- 224 × 224 frame resolution
-- 1280 MobileNetV2 features per frame
-🔬 Training
-The training pipeline uses:
-- Training set
-- Validation set
-- Held-out test set
-- Class weighting
-- Early stopping
-- Model checkpointing
-- Learning-rate reduction
-- Binary classification
-Training configuration:
-Maximum Epochs : 100
-Batch Size     : 8
-Sequence Length: 30
-Feature Size   : 1280
+The project uses:
 
-The trained model is stored as:
-model.keras
+- **Image size:** 224 × 224
+- **Sequence length:** 15 frames
+- **Feature extractor:** MobileNetV2
+- **Temporal model:** LSTM
+- **Task:** Binary classification
 
-📈 Model Evaluation
-The project uses both an internal held-out test set and a separate external evaluation set.
-Internal Held-Out Test
-The processed dataset was divided into:
-Training   : 2800
-Validation : 599
-Test       : 600
+---
 
-At a classification threshold of 0.50, the held-out test accuracy was:
-75.83%
-Confusion matrix:
-              Predicted
-              Real  Fake
+## 🎯 Decision Threshold
 
-Actual Real    253    47
-Actual Fake     98   202
+Instead of blindly using the default `0.50` classification threshold, the project includes a dedicated threshold-tuning procedure.
 
-External Evaluation
-A separate evaluation was performed on 100 unseen videos:
-Real : 50
-Fake : 50
+`tune_threshold.py`:
 
-The final external accuracy was:
-65.00%
-Classification report:
-              precision    recall  f1-score   support
+1. Reproduces the validation split used during training.
+2. Generates validation predictions.
+3. Tests thresholds from `0.10` to `0.90`.
+4. Evaluates accuracy, balanced accuracy and macro F1.
+5. Selects the threshold with the best validation balanced accuracy.
+6. Saves the selected threshold to `threshold.txt`.
+7. Evaluates the selected threshold on the held-out test set.
 
-Real            0.68       0.56      0.62        50
-Fake            0.63       0.74      0.68        50
+The current tuned threshold is:
 
-accuracy                               0.65       100
-macro avg       0.66       0.65      0.65       100
-weighted avg    0.66       0.65      0.65       100
+```text
+0.75
+```
 
-Confusion matrix:
-              Predicted
-              Real  Fake
+The threshold is selected using validation data rather than test data, helping prevent test-set leakage during threshold selection.
 
-Actual Real     28    22
-Actual Fake     13    37
+---
 
-The model correctly classified:
-28 / 50 Real videos
-37 / 50 Fake videos
+## 💻 Web Application
 
-The external evaluation is included to provide a more realistic assessment of performance on previously unseen videos.
-⚠️ Performance Note
-The internal held-out test accuracy and external evaluation accuracy represent different evaluation settings.
-The internal test set is derived from the processed project dataset, while the external evaluation uses separate unseen videos.
-Therefore, the project does not claim 75.83% real-world accuracy.
-The external benchmark achieved:
-65% accuracy on 100 unseen videos
-with:
-74% recall for Fake videos.
-🎯 Prediction Threshold
-The deployed prediction system uses:
-Threshold = 0.75
+The project includes a Flask-based web interface.
 
-The prediction logic is:
-Probability >= 0.75
-        ↓
-      FAKE
+### Main functionality
 
-Probability < 0.75
-        ↓
-      REAL
+- Video upload
+- File validation
+- Frame extraction
+- Memory-efficient feature extraction
+- Deepfake prediction
+- Confidence calculation
+- Real/Fake probability display
+- Video-frame previews
+- Automatic cleanup of uploaded videos
 
-The threshold was selected using validation data.
-🌐 Web Application
-The project includes a Flask-based web application.
-Users can:
-- Upload videos
-- Drag and drop videos
-- Start AI analysis
-- View REAL/FAKE prediction
-- View prediction confidence
-- View fake probability
-- View real probability
-- View extracted frames
-The application provides a simple interface for interacting with the trained deep learning model.
-💻 Installation
-1. Clone the Repository
-git clone https://github.com/omkar22A/deepfake-detection.git
+---
 
-Enter the project directory:
-cd deepfake-detection
+## 🛠️ Technologies Used
 
-2. Create a Virtual Environment
-Windows:
-python -m venv venv
+### Programming
 
-Activate the environment:
-venv\Scripts\activate
+- Python
 
-3. Install Dependencies
-pip install -r requirements.txt
+### Machine Learning / Deep Learning
 
-▶️ Run the Web Application
-Start the Flask server:
-python app.py
+- TensorFlow
+- Keras
+- MobileNetV2
+- LSTM
+- Scikit-learn
 
-Open the application in your browser:
-http://127.0.0.1:5000
+### Computer Vision
 
-Upload a supported video and click:
-Analyze Video
+- OpenCV
+- NumPy
 
-The system will process the video and display the prediction.
-🔎 Command-Line Prediction
-Individual videos can also be analyzed from the terminal.
-Run:
-python predict.py video.mp4
+### Web Development
 
-Example:
-============================================================
-Prediction Result
-============================================================
+- Flask
+- HTML
+- CSS
+- JavaScript
 
-Prediction        : REAL
-Confidence        : 66.17%
-Fake Probability  : 33.83%
-Real Probability  : 66.17%
+### Data Processing
 
-============================================================
+- NumPy
+- Scikit-learn
 
-📁 Project Structure
+---
+
+## 📁 Project Structure
+
+```text
 deepfake-detection/
 │
 ├── app.py
-├── config.py
-├── evaluate_folder.py
-├── model.py
 ├── predict.py
-├── preprocess.py
 ├── train.py
+├── tune_threshold.py
 ├── utils.py
-│
+├── threshold.txt
 ├── model.keras
-│
-├── requirements.txt
-├── README.md
-├── LICENSE
-├── .gitignore
 │
 ├── templates/
 │   └── index.html
 │
 ├── static/
-│   ├── style.css
 │   └── script.js
 │
-└── test_videos/
-    ├── real/
-    └── fake/
+├── processed_data/
+│   ├── X.npy
+│   └── y.npy
+│
+├── dataset/
+│
+├── test_videos/
+│
+└── uploads/
+```
 
-🛠️ Technologies Used
-Programming
-- Python
-Deep Learning
-- TensorFlow
-- Keras
-- MobileNetV2
-- Bidirectional LSTM
-- Multi-Head Attention
-Computer Vision
-- OpenCV
-Data Science
-- NumPy
-- Scikit-learn
-Web Development
-- Flask
-- HTML
-- CSS
-- JavaScript
-- Bootstrap
-- Font Awesome
-🧩 Main Project Files
-app.py
-Runs the Flask web application and handles video prediction requests.
-model.py
-Defines the deep learning model architecture.
-predict.py
-Performs memory-efficient prediction on individual videos.
-preprocess.py
-Processes videos and creates the feature dataset.
-train.py
-Trains the deep learning classification model.
-evaluate_folder.py
-Evaluates the model using videos organized into Real and Fake folders.
-utils.py
-Contains shared video-processing, face-detection and feature-extraction functions.
-templates/index.html
-Contains the web application's user interface.
-static/script.js
-Handles video upload, prediction requests and result visualization.
-static/style.css
-Contains the application's visual styling.
-💾 Memory-Efficient Inference
-The prediction system was designed to work on systems with limited RAM.
-Instead of processing all video frames through MobileNetV2 simultaneously, the application extracts features in small batches.
-Video
-  ↓
-30 Frames
-  ↓
-Small Feature Batches
-  ↓
-MobileNetV2
-  ↓
-1280-Dimensional Features
-  ↓
-LSTM + Attention
-  ↓
-Prediction
+> Large datasets, generated files, uploaded videos and the Python virtual environment are excluded from version control through `.gitignore`.
 
-This reduces peak memory usage during inference.
-⚠️ Limitations
-The current system has several limitations:
-- External accuracy was 65% on the tested 100-video benchmark.
-- Performance may vary depending on video quality.
-- Face detection may fail under extreme poses or occlusion.
-- Lighting conditions can affect predictions.
-- Compression artifacts may affect model performance.
-- Different deepfake generation techniques may produce different results.
-- The dataset size limits generalization.
-- The system is not a forensic-grade deepfake verification tool.
-Therefore, predictions should be treated as an AI-based classification result rather than definitive proof that a video is authentic or manipulated.
-🔮 Future Improvements
-Potential future improvements include:
+---
+
+## ⚙️ Installation
+
+### 1. Clone the repository
+
+```bash
+git clone https://github.com/omkar22A/deepfake-detection.git
+cd deepfake-detection
+```
+
+### 2. Create a virtual environment
+
+Python 3.11 is recommended for compatibility with the project's TensorFlow/Keras environment.
+
+```bash
+python -m venv venv
+```
+
+### 3. Activate the environment
+
+### Windows
+
+```powershell
+venv\Scripts\activate
+```
+
+### 4. Install dependencies
+
+If a `requirements.txt` file is available:
+
+```bash
+pip install -r requirements.txt
+```
+
+Otherwise, install the required Python packages according to the project's environment.
+
+---
+
+## ▶️ Running the Web Application
+
+Start the Flask application:
+
+```bash
+python app.py
+```
+
+The application will be available locally at:
+
+```text
+http://127.0.0.1:5000
+```
+
+Open the address in a browser and upload a supported video.
+
+---
+
+## 🔬 Command-Line Prediction
+
+The prediction pipeline can also be executed directly:
+
+```bash
+python predict.py video.mp4
+```
+
+Example output:
+
+```text
+============================================================
+Prediction Result
+============================================================
+
+Prediction        : FAKE
+Confidence        : XX.XX%
+Fake Probability  : XX.XX%
+Real Probability  : XX.XX%
+
+============================================================
+```
+
+---
+
+## 🧪 Threshold Tuning
+
+To reproduce threshold selection:
+
+```bash
+python tune_threshold.py
+```
+
+The script uses the validation split to determine the best classification threshold and writes the selected value to:
+
+```text
+threshold.txt
+```
+
+This keeps threshold optimization separate from the main inference pipeline.
+
+---
+
+## 🧠 Memory-Efficient Design
+
+The application was designed with lower-RAM systems in mind.
+
+Key optimizations include:
+
+- Small feature-extraction batch size
+- Batch-wise MobileNetV2 inference
+- Explicit deletion of large NumPy arrays
+- Python garbage collection
+- Memory-mapped processed datasets during threshold tuning
+- Avoiding unnecessary copies of large frame arrays
+
+The inference batch size is currently:
+
+```python
+FEATURE_BATCH_SIZE = 2
+```
+
+This helps reduce peak RAM usage during video processing.
+
+---
+
+## 📊 Evaluation
+
+The threshold-tuning pipeline evaluates:
+
+- Accuracy
+- Balanced Accuracy
+- Macro F1
+- Classification Report
+- Confusion Matrix
+
+The threshold is optimized on the validation set and then evaluated on the held-out test set.
+
+### Important
+
+The project intentionally does **not** claim a single headline accuracy number here without a reproducible evaluation result being documented.
+
+This avoids presenting a potentially misleading performance figure.
+
+---
+
+## 🔐 File Handling
+
+Uploaded videos are:
+
+1. Validated for supported file types.
+2. Saved temporarily for processing.
+3. Passed through the prediction pipeline.
+4. Removed after prediction.
+
+The application also limits upload size to **500 MB**.
+
+---
+
+## ⚠️ Limitations
+
+Deepfake detection is an evolving research problem.
+
+The model's prediction can be affected by:
+
+- Video quality
+- Compression
+- Lighting
+- Face visibility
+- Unusual camera angles
+- Dataset bias
+- Previously unseen manipulation techniques
+
+Therefore, the output should be treated as a **model prediction rather than definitive proof** that a video is authentic or manipulated.
+
+---
+
+## 🔮 Future Improvements
+
+Potential improvements include:
+
 - Larger and more diverse training datasets
-- Additional deepfake datasets
-- Transformer-based temporal modeling
-- More advanced face detection
-- Face alignment
-- Improved data augmentation
-- Cross-dataset evaluation
-- Better confidence calibration
-- Explainable AI visualizations
-- GPU acceleration
-- Model ensemble techniques
+- Face detection and alignment improvements
+- Advanced temporal architectures
+- Transformer-based video modelling
+- Better calibration of prediction confidence
+- Explainable AI / visual attention maps
+- GPU-accelerated inference
 - Cloud deployment
 - REST API deployment
-- Real-time video analysis
-🎓 Academic Project
-This project was developed as a:
-Bachelor of Engineering — Artificial Intelligence & Data Science
-The project demonstrates practical applications of:
-- Computer Vision
-- Deep Learning
-- Transfer Learning
-- Sequence Modeling
-- Attention Mechanisms
-- Model Evaluation
-- Flask Web Development
-- Machine Learning Deployment
-👨‍💻 Author
-Omkar Avasarkar
-Artificial Intelligence & Data Science
-GitHub:
-https://github.com/omkar22A
-Project Repository:
-https://github.com/omkar22A/deepfake-detection
-📜 License
-This project is licensed under the MIT License.
-See the LICENSE file for details.
-⭐ Project Summary
-This project implements an end-to-end deepfake video detection pipeline combining computer vision, transfer learning and temporal deep learning.
-Video
-  ↓
-Face Detection
-  ↓
-Frame Processing
-  ↓
-MobileNetV2
-  ↓
-Temporal Feature Sequence
-  ↓
-Bidirectional LSTM
-  ↓
-Multi-Head Attention
-  ↓
-Classification
-  ↓
-REAL / FAKE
-  ↓
-Flask Web Application
+- Automated evaluation dashboards
 
-The project covers the complete workflow from video preprocessing and feature extraction to model training, evaluation and web-based deployment.
-```
+---
+
+## 📌 Key Learning Outcomes
+
+This project provided practical experience with:
+
+- Deep learning model development
+- CNN feature extraction
+- Transfer learning
+- LSTM-based sequence modelling
+- Video preprocessing
+- Computer vision with OpenCV
+- Model evaluation
+- Threshold optimization
+- Flask application development
+- Frontend-backend integration
+- Memory optimization
+- Git and GitHub version control
+
+---
+
+## 👨‍💻 Author
+
+**Omkar Avasarkar**
+
+AI & Data Science Engineer
+
+Interested in:
+
+- Data Science
+- Machine Learning
+- Data Analytics
+- Artificial Intelligence
+- Python Development
+
+---
+
+## ⭐ Project
+
+If you find the project useful or interesting, consider giving the repository a ⭐ on GitHub.
