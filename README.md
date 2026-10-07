@@ -12,7 +12,7 @@ Deepfake technology can generate highly realistic manipulated videos, creating c
 
 This project aims to provide an accessible deepfake detection system where users can upload a video through a web interface and receive:
 
-- **REAL / FAKE classification**
+- REAL / FAKE classification
 - Prediction confidence
 - Fake probability
 - Real probability
@@ -29,30 +29,30 @@ The system uses a hybrid **CNN + LSTM** approach.
                  Input Video
                       │
                       ▼
-              Frame Extraction
+               Frame Extraction
                       │
                       ▼
-                Video Frames
+                 Video Frames
                       │
                       ▼
-               MobileNetV2
-            Spatial Feature Extraction
+                  MobileNetV2
+             Spatial Feature Extraction
                       │
                       ▼
-             Sequential Features
+              Sequential Features
                       │
                       ▼
                     LSTM
-             Temporal Modelling
+              Temporal Modelling
                       │
                       ▼
-              Binary Prediction
+               Binary Prediction
                       │
                       ▼
-          Threshold-based Decision
-             ┌────────┴────────┐
-             ▼                 ▼
-           REAL               FAKE
+           Threshold-based Decision
+              ┌────────┴────────┐
+              ▼                 ▼
+            REAL               FAKE
 ```
 
 ### MobileNetV2
@@ -71,11 +71,11 @@ This allows the system to learn patterns that occur across multiple frames rathe
 
 The project uses:
 
-- **Image size:** 224 × 224
-- **Sequence length:** 15 frames
-- **Feature extractor:** MobileNetV2
-- **Temporal model:** LSTM
-- **Task:** Binary classification
+- Image size: **224 × 224**
+- Sequence length: **15 frames**
+- Feature extractor: **MobileNetV2**
+- Temporal model: **LSTM**
+- Task: **Binary classification**
 
 ---
 
@@ -105,7 +105,7 @@ The threshold is selected using validation data rather than test data, helping p
 
 ## 💻 Web Application
 
-The project includes a Flask-based web interface.
+The project includes a **Flask-based web interface**.
 
 ### Main functionality
 
@@ -207,9 +207,9 @@ python -m venv venv
 
 ### 3. Activate the environment
 
-### Windows
+#### Windows
 
-```powershell
+```bash
 venv\Scripts\activate
 ```
 
@@ -323,7 +323,7 @@ The threshold is optimized on the validation set and then evaluated on the held-
 
 ### Important
 
-The project intentionally does **not** claim a single headline accuracy number here without a reproducible evaluation result being documented.
+The project intentionally does not claim a single headline accuracy number here without a reproducible evaluation result being documented.
 
 This avoids presenting a potentially misleading performance figure.
 
@@ -393,6 +393,13 @@ This project provided practical experience with:
 - Frontend-backend integration
 - Memory optimization
 - Git and GitHub version control
+
+---
+
+## 👥 Contributors
+
+- **Omkar Avasarkar** — Project Lead, ML Development & Web Application
+- **Dnyaneshwari Sonawane** — Dataset Preparation, Testing & Documentation
 
 ---
 
